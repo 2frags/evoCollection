@@ -273,7 +273,7 @@
 			}
 			
 		}		
-		$tbl.= '<td><div class="actions text-center text-nowrap"><a href="index.php?a=27&amp;id='.$row['id'].'&amp;dir=DESC&amp;sort=createdon" title="Редактировать"><i class="fa fa-pencil-square-o"></i></a><a href="'.$modx->makeurl($row['id'],'','','full').'" target="_blank"><i class="fa fa-eye" aria-hidden="true"></i></a></div></td><td><input type="checkbox" name="docid[]" value="'.$row['id'].'" class="docid"></td></tr>';		
+		$tbl.= '<td><div class="actions text-center text-nowrap"><a  onclick="window.open(\'index.php?a=27&amp;id='.$row[id].'\',\'Elements\',\'width=1600,height=1000,top=\'+((screen.height-1000)/2)+\',left=\'+((screen.width-1600)/2)+\',toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=no\')" title="Редактировать"><i class="fa fa-pencil-square-o"></i></a></div></td><td><input type="checkbox" name="docid[]" value="'.$row[id].'" class="docid"></td></tr>';
 	}
 	
 	
