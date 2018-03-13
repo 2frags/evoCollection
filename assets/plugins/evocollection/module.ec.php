@@ -1,5 +1,5 @@
 <?php
-	if (!defined('MODX_BASE_PATH')) { die('What are you doing? Get out of here!'); }
+	if(!isset($_SESSION['mgrValidated'])){ die();}
 	require_once(MODX_BASE_PATH."assets/plugins/evocollection/config.inc.php");
 	
 	$page = '
@@ -11,7 +11,17 @@
 	<script type="text/javascript" src="media/script/tabpane.js"></script>
 	<script type="text/javascript">';
 	
-	$optArr = array('default'=>'По умолчанию','user'=>'Пользовательский','number'=>'Числовой','date'=>'Дата','image'=>'Картинка','file'=>'Файл','textarea'=>'Текстовое поле','richtext'=>'Текстовый редактор');
+	$optArr = array(
+	'default'=>'По умолчанию',
+	'user'=>'Пользовательский',
+	'number'=>'Числовой',
+	'date'=>'Дата',
+	'image'=>'Картинка',
+	'file'=>'Файл',
+	'textarea'=>'Текстовое поле',
+	'richtext'=>'Текстовый редактор',
+	'select'=>'Одиночный выбор (TV)',	
+	'oncecheckbox'=>'Одиночный чекбокс');
 	$optSelect='';
 	foreach($optArr as $key => $val) $optSelect.='<option value=\''.$key.'\'>'.$val.'</option>';
 	$page.='optSelect = "'.$optSelect.'";'.PHP_EOL;

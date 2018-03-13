@@ -1,7 +1,6 @@
-<?php
-	
-	if (!$_SESSION[mgrInternalKey]) { die('What are you doing? Get out of here!'); }	
-	if (!$_GET[id]) return;	
+<?php	
+	if(!isset($_SESSION['mgrValidated'])){ die();}	
+	if (!$_GET['id']) return;	
 	if ($_GET['a']==4) return;	
 	if(($_GET['act']) && ($_GET['docid']))
 	{
@@ -15,11 +14,8 @@
 		}
 	}
 	
-	$cf = array();
-	
-	
-	$output.='';
-	
+	$cf = array();	
+	$output.='';	
 	$tid = $modx->db->getValue('Select template from '.$modx->getFullTableName('site_content').' where id='.$id);
 	
 	foreach($configuration as $key => $conf)
@@ -55,11 +51,9 @@
 			}
 		}
 		
-	}
-	
+	}	
 	if (!$fields) return;
-	
-	
+		
 	// Filed for sort
 	if ($_GET['sorter']) $sorter = $_GET['sorter'];
 	else 
@@ -187,7 +181,7 @@
 		if ($cf[$f]['table']!='tv')
 		{			
 			$url = $modx->config[site_manager_url];
-			$url.= '?a=27&id='.$_GET[id];			
+			$url.= '?a=27&id='.$_GET['id'];			
 			if ($_GET['show']) $url.='&show='.$_GET['show'];
 			$url.='&sorter=c.'.$cf[$f]['caption'];
 			if ($_GET['direction']=='asc')
@@ -210,6 +204,7 @@
 		$tbl.='<td width="'.$width.'">'.$caption.'</td>';
 	}
 	
+		
 	$tbl.='<th width="1%"></th><th><input type="checkbox"  id="checkall" ></th></tr></thead><tbody>';
 	
 	$res = $modx->db->query($sql);	
@@ -229,7 +224,8 @@
 		$tbl.= '<tr data-id="'.$row['id'].'" '.$deltr.' '.$getsr.'>';
 		foreach($ff as $f)
 		{
-			
+		
+				
 			
 			if($cf[$f]['table']=='tv') $table="tv";
 			else $table = "content";
@@ -245,41 +241,43 @@
 				$tbl.='
 				<td>
 				<div class="ecoll_field"><div class="input" 
-				data-id="'.$row[id].'"
-				data-table="'.$table.'"
+				data-id="'.$row['id'].'"
+				data-table="'.$table.'"				
 				data-field="'.$f.'"
+				data-elements="'.$modx->db->escape($cf[$f]['elements']).'"
+				data-delimiter="'.$modx->db->escape($cf[$f]['delimiter']).'"
 				data-user_func="'.$user.'"									
 				data-type="'.$type.'"																		
 				>'.get_output(
-				array('did'=>$row[id],
+				array('did'=>$row['id'],
 				'value'=>$row[$f],
 				'field'=>$f,
 				'table'=>$table,
 				'type'=>$type,
+				'elements'=>$cf[$f]['elements'],
+				'delimiter'=>$cf[$f]['delimiter'],
 				'user_func'=>$user,
 				'mode'=>'input')).'</div>
 				
 				
-				<div class="output">'.get_output(array('did'=>$row[id],
+				<div class="output">'.get_output(array('did'=>$row['id'],
 				'value'=>$row[$f],
 				'field'=>$f,
 				'table'=>$table,
+				'elements'=>$cf[$f]['elements'],
+				'delimiter'=>$cf[$f]['delimiter'],
 				'type'=>$type,
 				'user_func'=>$user,
 				'mode'=>'output')).'</div></div>
 				</td>';
 			}
 			
-		}
-		
-		$tbl.= '<td><div class="actions text-center text-nowrap"><a href="index.php?a=27&amp;id='.$row[id].'&amp;dir=DESC&amp;sort=createdon" title="Редактировать"><i class="fa fa-pencil-square-o"></i></a></div></td><td><input type="checkbox" name="docid[]" value="'.$row[id].'" class="docid"></td></tr>';
-		
+		}		
+		$tbl.= '<td><div class="actions text-center text-nowrap"><a href="index.php?a=27&amp;id='.$row['id'].'&amp;dir=DESC&amp;sort=createdon" title="Редактировать"><i class="fa fa-pencil-square-o"></i></a><a href="'.$modx->makeurl($row['id'],'','','full').'" target="_blank"><i class="fa fa-eye" aria-hidden="true"></i></a></div></td><td><input type="checkbox" name="docid[]" value="'.$row['id'].'" class="docid"></td></tr>';		
 	}
 	
 	
-	
-	if ($config[$idc]['new_doc']=='down') $tbl.='<tr id="newstrbutt"><td colspan="'.(count($ff)+1).'"></td><td><i class="fa fa-plus" aria-hidden="true" id="news_str" data-template="'.$configuration[$idc]['template_default'].'" data-parent="'.$_GET['id'].'"></i><i class="fa fa-spinner fa-spin"  id="spiner_new_str"></i></td></tr>';
-	
+	if ($config[$idc]['new_doc']=='down') $tbl.='<tr id="newstrbutt"><td colspan="'.(count($ff)+1).'"></td><td><i class="fa fa-plus" aria-hidden="true" id="news_str" data-template="'.$configuration[$idc]['template_default'].'" data-parent="'.$_GET['id'].'"></i><i class="fa fa-spinner fa-spin"  id="spiner_new_str"></i></td></tr>';	
 	
 	$tbl.='</tbody></table></div></div>';
 
@@ -332,7 +330,7 @@
 	$output.='</ul></div>';
 	}
 	$output.='</div>';
-	$template = $modx->db->getValue('Select template from '.$modx->getFullTableName('site_content').' where parent='.$_GET[id]);
+	$template = $modx->db->getValue('Select template from '.$modx->getFullTableName('site_content').' where parent='.$_GET['id']);
 	if (!$template) $template=$default_template;
 	$output.='<div id="popup_rich"><div id="close"><i class="fa fa-close"></i></div><h2>Редактирование содержимого</h2><div id="rta"></div><div style="text-align:center; margin-top:10px;"><a  class="btn btn-success save_content">Сохранить</a></div></div></div>
 	
@@ -349,6 +347,5 @@
 	
 	
 	';		
-	
 	
 $e->output($output);

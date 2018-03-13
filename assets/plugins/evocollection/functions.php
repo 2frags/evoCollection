@@ -1,4 +1,6 @@
 <?php		
+	if(!isset($_SESSION['mgrValidated'])){ die();}
+	
 	if (!function_exists('get_output'))
 	{
 		function get_output($config)
@@ -7,23 +9,21 @@
 			if ($config['user_func']) return $modx->runSnippet($config['user_func'], $config);				
 			extract($config);		
 			
-			
-			if ($mode=='output')
-			{	
-				if (($type=='default') || ($type=='text'))
+			switch($mode)
+			{
+				case 'output':				
+				switch ($type)
 				{
-					$return = strip_tags($value);
-				}
-				if ($type=='mediumtext') 
-				{
+					case 'mediumtext':
 					$return = mb_substr(strip_tags($value),0,75).'...';
-				}
-				if ($type=='number') 
-				{
+					break;
+					
+					case 'number':
 					if (!$value) $return = 'не задано';
-				}
-				if ($type=='date') 
-				{
+					break;
+					
+					case 'date':
+					
 					if ($value)
 					{
 						$d = gmdate("d", $value); 
@@ -44,9 +44,9 @@
 						$return = $d.' '.$m.' '.$y; 
 					}
 					else $return = 'не задано';
-				}
-				if ($type=='image') 
-				{	
+					break;
+					
+					case 'image':						
 					
 					if ((file_exists(MODX_BASE_PATH.$value)) && ($value)) 
 					{
@@ -58,9 +58,9 @@
 						else return '<i class="fa fa-spinner fa-spin noimgs" data-href="'.$value.'"></i>';
 					}
 					else return '<img src="./../assets/snippets/phpthumb/noimage.png" width="64" height="64">';					
-				}
-				if ($type=='file') 
-				{
+					break;
+					
+					case 'file':						
 					if ($value)
 					{
 						$path = MODX_BASE_PATH.''.$value;
@@ -69,82 +69,146 @@
 						$return = $a[0];
 					}
 					else $return = 'не указан';
-				}
-				if (($type=='richtext') || ($type=='textarea'))
-				{
+					break;
 					
+					case 'richtext':							
 					$value = mb_substr(strip_tags($value),0,75).'...';
 					$value = str_replace('[','&#91;',$value);
 					$value = str_replace(']','&#93;',$value);
 					$return = $value;
-				}				
-				if ((!$return) && (!$value)) $return = '<div class="extender">не задан</div>';
-			}
-			
-			
-			
-			
-			if ($mode=='input')
-			{				
-				if (($type=='default') || ($type=='text'))
-				{
-					$value = htmlspecialchars($value);
-					$return = '<input type="text" value="'.$value.'">';
-				}
-				
-				$value = str_replace('"','\"',$value);
-				if ($type=='mediumtext') 
-				{
-					$return = mb_substr(strip_tags($value),0,75).'...';
-				}
-				if ($type=='number') 
-				{
-					$return = '<input type="number" value="'.strip_tags($value).'">';
-				}
-				if ($type=='date') 
-				{
-					if ($value>0)
+					break;									
+					
+					case 'textarea':					
+					$value = mb_substr(strip_tags($value),0,75).'...';
+					$value = str_replace('[','&#91;',$value);
+					$value = str_replace(']','&#93;',$value);
+					$return = $value;
+					break;
+					
+					case 'oncecheckbox':
+					if ($value) return '<div style="text-align:center;">Да</div>';
+					else return '<div style="text-align:center;">Нет</div>';
+					break;
+					
+					case 'select':					
+					$s='Не выбрано';
+					foreach(explode($delimiter,$elements) as $str)
 					{
-						$value = gmdate("Y-m-d", $value); 
-						$return = '<input type="date" value="'.strip_tags($value).'">';
+						
+						$col = explode('==',$str);
+						if (isset($col[1]))
+						{
+							if ($col[1]==$value) $s= $col[0];							
+						}
+						else 
+						{
+							if ($col[0]==$value) $s= $col[0];							
+						}
 					}
-					else $return = '<input type="date">';
+					return $s;
+					break;
+
+					
+					default:
+					$return = strip_tags($value);
+					break;		
+					
 				}
+				if ((!$return) && (!$value)) $return = '<div class="extender">не задан</div>';
+				break;
 				
-				if ($type=='image') 
-				{
-					$return = '<input type="text" id="tv_'.$field.'_'.$did.'" name="tv_'.$field.'_'.$did.'" value="'.strip_tags($value).'" data-id="tv_'.$field.'_'.$did.'" class="browser" data-browser="images">';
-				}
 				
-				if ($type=='file') 
-				{
-					$return = '<input type="text" id="tv_'.$field.'_'.$did.'" name="tv_'.$field.'_'.$did.'" value="'.strip_tags($value).'" data-id="tv_'.$field.'_'.$did.'" class="browser" data-browser="files">';
-				}
-				if ($type=='textarea') 
-				{
-					$return = '<div class="rte" data-type="textarea" id="ta_'.$field.'_'.$did.'"></div>';
-				}
 				
-				if ($type=='richtext') 
-				{
-					$return = '<div class="rte" data-type="rte" id="ta_'.$field.'_'.$did.'"></div>';
-				}
-			}
+				
+				case 'input':
+				$value = str_replace('"','\"',$value);				
+					switch($type)
+					{
+						default:
+						
+						$value = htmlspecialchars($value);
+						$return = '<input type="text" value="'.$value.'">';
+						break;
+						
+						
+						case 'mediumtext':
+						$return = mb_substr(strip_tags($value),0,75).'...';
+						break;
+						
+						case 'number':
+						$return = '<input type="number" value="'.strip_tags($value).'">';
+						break;
+						
+						case 'date':						
+						if ($value>0)
+						{
+							$value = gmdate("Y-m-d", $value); 
+							$return = '<input type="date" value="'.strip_tags($value).'">';
+						}
+						else $return = '<input type="date">';
+						break;
+						
+						case 'image':						
+						$return = '<input type="text" id="tv_'.$field.'_'.$did.'" name="tv_'.$field.'_'.$did.'" value="'.strip_tags($value).'" data-id="tv_'.$field.'_'.$did.'" class="browser" data-browser="images">';
+						break;
+						
+						case 'file':						
+						$return = '<input type="text" id="tv_'.$field.'_'.$did.'" name="tv_'.$field.'_'.$did.'" value="'.strip_tags($value).'" data-id="tv_'.$field.'_'.$did.'" class="browser" data-browser="files">';
+						break;
+						
+						case 'textarea':
+						$return = '<div class="rte" data-type="textarea" id="ta_'.$field.'_'.$did.'"></div>';
+						break;
+						
+						case 'richtext':
+						$return = '<div class="rte" data-type="rte" id="ta_'.$field.'_'.$did.'"></div>';
+						break;
+						
+						case 'oncecheckbox':
+						if ($value) $chk=' checked="checked"';
+						$return = '<input type="checkbox" value="1"'.$chk.' style="margin:0 auto;">';
+						break;
+						
+						case 'select':
+						$s = '<select>';					
+						foreach(explode($delimiter,$elements) as $str)
+						{
+							$col = explode('==',$str);
+							if (isset($col[1]))
+							{
+								if ($col[1]==$value) $s.= '<option value="'.$col[1].'" selected="selected">'.$col[0].'</option>';
+								else $s.= '<option value="'.$col[1].'">'.$col[0].'</option>';
+							}
+							else 
+							{
+								if ($col[0]==$value) $s.= '<option value="'.$col[0].'" selected="selected">'.$col[0].'</option>';
+								else $s.= '<option value="'.$col[0].'">'.$col[0].'</option>';
+							}
+						}
+						return $s.'</select>';
+						break;
+						
+					}
+				break;
+				
+				case 'execute':							
+					switch ($type) 
+					{			
+						case 'date':
+						$startdate = date($value." 12:00:00");
+						return strtotime($startdate);				
+						break;
+						
+						case 'oncecheckbox':
+						if ($value) return 1;
+						else return 0;
+						break;
+
+					}			
+				break;
+			}	
 			
-			if ($mode=='execute')
-			{			
-				if ($type=='date') 
-				{				
-					$startdate = date($value." 12:00:00");
-					return strtotime($startdate);				
-				}			
-			}
-			
-			
-			
-			if (!$return) $return=$value;			
-			
-			
-			return $return;
-		}	
-	}		
+			if (!$return) $return=$value;				
+			return $return;				
+		}		
+	}

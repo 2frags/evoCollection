@@ -81,6 +81,8 @@ function set_field_value(tag,value)
 		"table":tag.data("table"),
 		"id":tag.closest("tr").data("id"),
 		"parent":$_GET('id'),		
+		"delimiter":tag.data("delimiter"),
+		"elements":tag.data("elements"),
 		"field":tag.data("field"),
 		"type":tag.data("type"),
 		"user_func":tag.data("user_func"),
@@ -115,9 +117,16 @@ function truncate(str, maxlength)
 
 function blur_input(el)
 {
+	var val = el.val()
+	if (el.attr('type')=='checkbox') 
+	{
+		if(el.prop("checked")) val =1
+		else val=0
+	}
+		
 	el.closest('.input').hide();
 	el.closest('.input').next().show();
-	set_field_value(el.parent(),el.val());	
+	set_field_value(el.parent(),val);	
 	not_submit = false;
 }
 function set_photo(idx)
@@ -196,8 +205,7 @@ $j(document).ready(function(){
 		
 	});
 	
-	$j('#table_doc').on('change','.browser',function(){
-		//$j('.browser').change(function(){
+	$j('#table_doc').on('change','.browser',function(){		
 		blur_input($j(this));
 	});
 	
