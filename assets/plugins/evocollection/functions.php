@@ -195,7 +195,7 @@
 					switch ($type) 
 					{			
 						case 'date':
-						$startdate = date($value." 12:00:00");
+						$startdate = date($value.date("H:i:s"));
 						return strtotime($startdate);				
 						break;
 						
